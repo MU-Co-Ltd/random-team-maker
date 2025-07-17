@@ -42,7 +42,7 @@ export default function MembersScreen() {
       await addMember(newMemberName);
       setNewMemberName('');
       Alert.alert('成功', 'メンバーを追加しました');
-    } catch (error) {
+    } catch {
       Alert.alert('エラー', 'メンバーの追加に失敗しました');
     }
   };
@@ -81,7 +81,7 @@ export default function MembersScreen() {
       setEditingMember(null);
       setEditingName('');
       Alert.alert('成功', 'メンバー情報を更新しました');
-    } catch (error) {
+    } catch {
       Alert.alert('エラー', 'メンバー情報の更新に失敗しました');
     }
   };
@@ -99,7 +99,7 @@ export default function MembersScreen() {
             try {
               await deleteMember(member.id);
               Alert.alert('成功', 'メンバーを削除しました');
-            } catch (error) {
+            } catch {
               Alert.alert('エラー', 'メンバーの削除に失敗しました');
             }
           },

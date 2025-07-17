@@ -1,58 +1,63 @@
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { TeamDivisionResult } from '@/types';
-import { historyStorage } from '@/utils/storage';
-import { useEffect, useState } from 'react';
+import { Colors } from '@/constants/Colors'
+import { useColorScheme } from '@/hooks/useColorScheme'
+import { TeamDivisionResult } from '@/types'
+import { historyStorage } from '@/utils/storage'
+import { useEffect, useState } from 'react'
 import {
-    FlatList,
-    Modal,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+  FlatList,
+  Modal,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
 export default function HistoryTab() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  const [history, setHistory] = useState<TeamDivisionResult[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedResult, setSelectedResult] = useState<TeamDivisionResult | null>(null);
-  const [showDetail, setShowDetail] = useState(false);
+  const colorScheme = useColorScheme()
+  const colors = Colors[colorScheme ?? 'light']
+  const [history, setHistory] = useState<TeamDivisionResult[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedResult, setSelectedResult] =
+    useState<TeamDivisionResult | null>(null)
+  const [showDetail, setShowDetail] = useState(false)
 
   useEffect(() => {
-    loadHistory();
-  }, []);
+    loadHistory()
+  }, [])
 
   const loadHistory = async () => {
     try {
-      const historyData = await historyStorage.getHistory();
-      setHistory(historyData);
+      const historyData = await historyStorage.getHistory()
+      setHistory(historyData)
     } catch (error) {
-      console.error('Failed to load history:', error);
+      console.error('Failed to load history:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const viewDetails = (result: TeamDivisionResult) => {
-    setSelectedResult(result);
-    setShowDetail(true);
-  };
+    setSelectedResult(result)
+    setShowDetail(true)
+  }
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <Text style={[styles.loadingText, { color: colors.text }]}>
           読み込み中...
         </Text>
       </SafeAreaView>
-    );
+    )
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>
@@ -63,117 +68,166 @@ export default function HistoryTab() {
           </Text>
         </View>
 
-      {history.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: colors.text + '60' }]}>
-            まだチーム分けの履歴がありません
-          </Text>
-          <Text style={[styles.emptySubtext, { color: colors.text + '40' }]}>
-            「チーム分け」タブでチーム分けを実行してください
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={history}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[styles.historyItem, { borderColor: colors.text + '20' }]}
-              onPress={() => viewDetails(item)}
-            >
-              <View style={styles.historyHeader}>
-                <Text style={[styles.historyDate, { color: colors.text }]}>
-                  {item.createdAt.toLocaleDateString('ja-JP', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </Text>
-                <Text style={[styles.historyInfo, { color: colors.text + '80' }]}>
-                  {item.participants.length}人 → {item.teams.length}チーム
-                </Text>
-              </View>
-              <Text style={[styles.historyDetails, { color: colors.text + '60' }]}>
-                チーム人数: {item.teamSize}人
-              </Text>
-              <View style={styles.teamsPreview}>
-                {item.teams.slice(0, 3).map((team, index) => (
-                  <Text key={index} style={[styles.teamPreview, { color: colors.text + '80' }]}>
-                    チーム{index + 1}: {team.map(m => m.name).join(', ')}
-                  </Text>
-                ))}
-                {item.teams.length > 3 && (
-                  <Text style={[styles.moreTeams, { color: colors.text + '60' }]}>
-                    ...他{item.teams.length - 3}チーム
-                  </Text>
-                )}
-              </View>
-            </TouchableOpacity>
-          )}
-          style={styles.historyList}
-        />
-      )}
-
-      <Modal visible={showDetail} animationType="slide">
-        <SafeAreaView style={[styles.modalContainer, { backgroundColor: colors.background }]}>
-          <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              チーム分け詳細
+        {history.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={[styles.emptyText, { color: colors.text + '60' }]}>
+              まだチーム分けの履歴がありません
             </Text>
-            <TouchableOpacity
-              style={[styles.closeButton, { backgroundColor: colors.tint }]}
-              onPress={() => setShowDetail(false)}
-            >
-              <Text style={[styles.closeButtonText, { color: colorScheme === 'dark' ? colors.background : 'white' }]}>閉じる</Text>
-            </TouchableOpacity>
+            <Text style={[styles.emptySubtext, { color: colors.text + '40' }]}>
+              「チーム分け」タブでチーム分けを実行してください
+            </Text>
           </View>
+        ) : (
+          <FlatList
+            data={history}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.historyItem,
+                  { borderColor: colors.text + '20' },
+                ]}
+                onPress={() => viewDetails(item)}
+              >
+                <View style={styles.historyHeader}>
+                  <Text style={[styles.historyDate, { color: colors.text }]}>
+                    {item.createdAt.toLocaleDateString('ja-JP', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </Text>
+                  <Text
+                    style={[styles.historyInfo, { color: colors.text + '80' }]}
+                  >
+                    {item.participants.length}人 → {item.teams.length}チーム
+                  </Text>
+                </View>
+                <Text
+                  style={[styles.historyDetails, { color: colors.text + '60' }]}
+                >
+                  チーム人数: {item.teamSize}人
+                </Text>
+                <View style={styles.teamsPreview}>
+                  {item.teams.slice(0, 3).map((team, index) => (
+                    <Text
+                      key={index}
+                      style={[
+                        styles.teamPreview,
+                        { color: colors.text + '80' },
+                      ]}
+                    >
+                      チーム{index + 1}: {team.map((m) => m.name).join(', ')}
+                    </Text>
+                  ))}
+                  {item.teams.length > 3 && (
+                    <Text
+                      style={[styles.moreTeams, { color: colors.text + '60' }]}
+                    >
+                      ...他{item.teams.length - 3}チーム
+                    </Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+            )}
+            style={styles.historyList}
+          />
+        )}
 
-          {selectedResult && (
-            <View style={styles.modalContent}>
-              <View style={styles.resultInfo}>
-                <Text style={[styles.resultDate, { color: colors.text }]}>
-                  実行日時: {selectedResult.createdAt.toLocaleDateString('ja-JP', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+        <Modal visible={showDetail} animationType="slide">
+          <SafeAreaView
+            style={[{ backgroundColor: colors.background, flex: 1 }]}
+          >
+            <View style={[styles.modalContainer]}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  チーム分け詳細
                 </Text>
-                <Text style={[styles.resultStats, { color: colors.text + '80' }]}>
-                  参加者: {selectedResult.participants.length}人 / チーム人数: {selectedResult.teamSize}人
-                </Text>
+                <TouchableOpacity
+                  style={[styles.closeButton, { backgroundColor: colors.tint }]}
+                  onPress={() => setShowDetail(false)}
+                >
+                  <Text
+                    style={[
+                      styles.closeButtonText,
+                      {
+                        color:
+                          colorScheme === 'dark' ? colors.background : 'white',
+                      },
+                    ]}
+                  >
+                    閉じる
+                  </Text>
+                </TouchableOpacity>
               </View>
 
-              <FlatList
-                data={selectedResult.teams}
-                keyExtractor={(_, index) => `team-${index}`}
-                renderItem={({ item: team, index }) => (
-                  <View style={[styles.teamDetailContainer, { borderColor: colors.text + '20' }]}>
-                    <Text style={[styles.teamDetailTitle, { color: colors.text }]}>
-                      チーム {index + 1} ({team.length}人)
+              {selectedResult && (
+                <View style={styles.modalContent}>
+                  <View style={styles.resultInfo}>
+                    <Text style={[styles.resultDate, { color: colors.text }]}>
+                      実行日時:{' '}
+                      {selectedResult.createdAt.toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </Text>
-                    {team.map((member, memberIndex) => (
-                      <Text
-                        key={member.id}
-                        style={[styles.teamDetailMember, { color: colors.text + '80' }]}
-                      >
-                        {memberIndex + 1}. {member.name}
-                      </Text>
-                    ))}
+                    <Text
+                      style={[
+                        styles.resultStats,
+                        { color: colors.text + '80' },
+                      ]}
+                    >
+                      参加者: {selectedResult.participants.length}人 /
+                      チーム人数: {selectedResult.teamSize}人
+                    </Text>
                   </View>
-                )}
-                style={styles.teamDetailList}
-              />
+
+                  <FlatList
+                    data={selectedResult.teams}
+                    keyExtractor={(_, index) => `team-${index}`}
+                    renderItem={({ item: team, index }) => (
+                      <View
+                        style={[
+                          styles.teamDetailContainer,
+                          { borderColor: colors.text + '20' },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.teamDetailTitle,
+                            { color: colors.text },
+                          ]}
+                        >
+                          チーム {index + 1} ({team.length}人)
+                        </Text>
+                        {team.map((member, memberIndex) => (
+                          <Text
+                            key={member.id}
+                            style={[
+                              styles.teamDetailMember,
+                              { color: colors.text + '80' },
+                            ]}
+                          >
+                            {memberIndex + 1}. {member.name}
+                          </Text>
+                        ))}
+                      </View>
+                    )}
+                    style={styles.teamDetailList}
+                  />
+                </View>
+              )}
             </View>
-          )}
-        </SafeAreaView>
-      </Modal>
+          </SafeAreaView>
+        </Modal>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -257,7 +311,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   modalContainer: {
-    flex: 1,
     padding: 16,
   },
   modalHeader: {
@@ -313,4 +366,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 2,
   },
-});
+})
