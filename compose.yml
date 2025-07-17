@@ -1,0 +1,11 @@
+services:
+  node:
+    image: node:latest
+    volumes:
+      - type: bind
+        source: "./project"
+        target: "/project"
+    working_dir: "/project"
+    ports:
+      - "8081:8081"
+    tty: true
